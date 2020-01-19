@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 
 networks:
   indexlin: #网络名称
@@ -25,10 +25,8 @@ services:
 
   php5.5.32:
     container_name: indexlin-php5.5.32
-    #build: #构建镜像
-    #  context: ./php7.2.4/.#构建镜像文件（dockerfile）位置
     image: indexlin/gzyx-php5.5.32:1.0
-    working_dir: /server #默认目录
+    working_dir: /server
     volumes:
       - ../server:/server
       - ./php5.5.32/php.ini:/usr/local/etc/php/conf.d/php.ini
@@ -39,8 +37,10 @@ services:
 
   php7.0.13:
     container_name: indexlin-php7.0.13
+    #build: #构建镜像
+    #  context: ./php7.2.4/.#构建镜像文件（dockerfile）位置
     image: indexlin/gzyx-php7.0.13:1.0
-    working_dir: /server
+    working_dir: /server  #默认目录
     volumes:
       - ../server:/server
       - ./php7.0.13/php.ini:/usr/local/etc/php/conf.d/php.ini
@@ -48,6 +48,7 @@ services:
       - indexlin
     ports:
       - "19700:9000"
+    #user: 1000:1000 #将id为1000的用户和id为1000的用户组权限挂载到该容器
 
   php7.24:
     container_name: indexlin-php7.24
