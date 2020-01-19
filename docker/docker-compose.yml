@@ -1,0 +1,105 @@
+version: '2'
+
+networks:
+  indexlin: #网络名称
+    driver: bridge #网络方式
+
+services:
+
+  nginx:
+    #restart: always #自动启docker的时候启动
+    container_name: indexlin-nginx #容器名称
+    image: nginx:1.17.0 #使用镜像
+    #depends_on: #依赖于php,php先启动，nginx才启动
+    #  - "php"
+    volumes:
+      - ../server:/server #挂载主机的../server目录到nginx的/server目录
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ../data/nginx/logs:/logs
+    networks:
+      - indexlin #容器网络
+    ports:
+      - "80:80" #主机的端口映射到nginx的端口
+
+
+
+  php5.5.32:
+    container_name: indexlin-php5.5.32
+    #build: #构建镜像
+    #  context: ./php7.2.4/.#构建镜像文件（dockerfile）位置
+    image: indexlin/gzyx-php5.5.32:1.0
+    working_dir: /server #默认目录
+    volumes:
+      - ../server:/server
+      - ./php5.5.32/php.ini:/usr/local/etc/php/conf.d/php.ini
+    networks:
+      - indexlin
+    ports:
+      - "19550:9000"
+
+  php7.0.13:
+    container_name: indexlin-php7.0.13
+    image: indexlin/gzyx-php7.0.13:1.0
+    working_dir: /server
+    volumes:
+      - ../server:/server
+      - ./php7.0.13/php.ini:/usr/local/etc/php/conf.d/php.ini
+    networks:
+      - indexlin
+    ports:
+      - "19700:9000"
+
+  php7.24:
+    container_name: indexlin-php7.24
+    image: indexlin/gzyx-php7.2.4:1.0
+    working_dir: /server
+    volumes:
+      - ../server:/server
+      - ./php7.2.4/php.ini:/usr/local/etc/php/conf.d/php.ini
+    networks:
+    - indexlin
+    ports:
+      - "19724:9000"
+
+
+  mysql5.7.21:
+    container_name: indexlin-mysql5.7.21
+    image: mysql:5.7.21
+    working_dir: /data
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: indexlin
+      MYSQL_PASSWORD: indexlin
+    volumes:
+      - ../data/mysql5.7.21:/var/lib/mysql
+      - ./mysql5.7.21/mysqld.cnf:/etc/mysql/mysql.conf.d/mysqld.cnf
+    networks:
+      - indexlin
+    ports:
+      - "13306:3306"
+
+  redis5.0.5:
+    container_name: indexlin-redis
+    image: redis:5.0.5
+    volumes:
+      - ../data/redis:/data
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      - indexlin
+    ports:
+      - "16379:6379"
+
+  node:
+    container_name: indexlin-node
+    volumes:
+      - ../web:/web:cached
+    image: node:10.15.3
+    networks:
+      - indexlin
+    tty: true
+    working_dir: /web
+    ports:
+      - "8080:8080"
+    #command: #多个命令执行
+    #  npm install
+    #  npm run dev
