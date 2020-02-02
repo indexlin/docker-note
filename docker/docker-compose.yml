@@ -52,7 +52,9 @@ services:
 
   php7.24:
     container_name: indexlin-php7.24
-    image: indexlin/gzyx-php7.2.4:1.0
+    build:
+      context: ./php7.2.4/.
+    image: indexlin/gzyx-php7.2.4:1.1
     working_dir: /server
     volumes:
       - ../server:/server
